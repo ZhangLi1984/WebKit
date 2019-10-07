@@ -247,7 +247,19 @@ void RegExp::byteCodeCompileIfNecessary(VM* vm)
 void RegExp::compile(VM* vm, Yarr::YarrCharSize charSize)
 {
     auto locker = holdLock(cellLock());
-    
+
+#if ENABLE(JIT)
+    printf ("JIT is enabled\n");
+#endif
+
+#if ENABLE(YARR_JIT)
+    printf ("RegExp JIT is enabled\n");
+#endif
+
+#if ENABLE(YARR_JIT_BACKREFERENCES)
+    printf ("RegExp Backreferences JIT is enabled\n");
+#endif
+
     Yarr::YarrPattern pattern(m_patternString, m_flags, m_constructionErrorCode, vm->stackLimit());
     if (hasError(m_constructionErrorCode)) {
         m_state = ParseError;

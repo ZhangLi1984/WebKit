@@ -704,7 +704,7 @@ public:
     {
         load32(setupArmAddress(address), dest);
     }
-
+    
     void load16Unaligned(BaseIndex address, RegisterID dest)
     {
         load16(setupArmAddress(address), dest);
@@ -802,7 +802,13 @@ public:
             m_assembler.ldrh(dest, address.base, dataTempRegister);
         }
     }
-    
+
+    void load16(ExtendedAddress, RegisterID)
+    {
+        // Need to implement
+        UNREACHABLE_FOR_PLATFORM();
+    }
+
     void load16SignedExtendTo32(ImplicitAddress, RegisterID)
     {
         UNREACHABLE_FOR_PLATFORM();
@@ -847,6 +853,17 @@ public:
     {
         move(imm, dataTempRegister);
         store32(dataTempRegister, address);
+    }
+
+    void store64(Imm64 imm, ImplicitAddress addr)
+    {
+        TrustedImm32 low = TrustedImm32(imm.asTrustedImm64().m_value & 0xffffffffUL);
+        TrustedImm32 high = TrustedImm32((imm.asTrustedImm64().m_value >> 32) & 0xffffffffUL);
+
+        store32(low, addr);
+
+        addr.offset += 4;
+        store32(high, addr);
     }
 
     void store8(RegisterID src, Address address)

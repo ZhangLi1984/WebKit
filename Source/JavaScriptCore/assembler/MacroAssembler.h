@@ -1714,7 +1714,7 @@ public:
         storePtr(value, addressForPoke(index));
     }
     
-#if CPU(X86_64) || CPU(ARM64)
+#if CPU(X86_64) || CPU(ARM64) || CPU(ARM_THUMB2)
     void poke(Imm64 value, int index = 0)
     {
         store64(value, addressForPoke(index));

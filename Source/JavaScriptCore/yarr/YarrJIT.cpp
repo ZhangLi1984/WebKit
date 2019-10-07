@@ -46,10 +46,19 @@ class YarrGenerator : public YarrJITInfo, private MacroAssembler {
     static const RegisterID index = ARMRegisters::r1;
     static const RegisterID length = ARMRegisters::r2;
     static const RegisterID output = ARMRegisters::r3;
-
+    static const RegisterID freelistRegister = ARMRegisters::r7;
+    static const RegisterID freelistSizeRegister = ARMRegisters::r9; // Only used during initialization.
+    
     static const RegisterID regT0 = ARMRegisters::r4;
     static const RegisterID regT1 = ARMRegisters::r5;
+    static const RegisterID regT2 = ARMRegisters::r6;
+    static const RegisterID remainingMatchCount = ARMRegisters::r10;
     static const RegisterID initialStart = ARMRegisters::r8;
+
+    static const RegisterID supplementaryPlanesBase = ARMRegisters::r4; // need better values
+    static const RegisterID leadingSurrogateTag = ARMRegisters::r5;
+    static const RegisterID trailingSurrogateTag = ARMRegisters::r6;
+    static const RegisterID endOfStringAddress = ARMRegisters::r7;
 
     static const RegisterID returnRegister = ARMRegisters::r0;
     static const RegisterID returnRegister2 = ARMRegisters::r1;
@@ -602,7 +611,7 @@ class YarrGenerator : public YarrJITInfo, private MacroAssembler {
         poke(imm, frameLocation);
     }
 
-#if CPU(ARM64) || CPU(X86_64)
+#if CPU(ARM64) || CPU(X86_64) || CPU(ARM_THUMB2)
     void storeToFrame(TrustedImmPtr imm, unsigned frameLocation)
     {
         poke(imm, frameLocation);

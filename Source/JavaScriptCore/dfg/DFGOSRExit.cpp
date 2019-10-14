@@ -402,7 +402,12 @@ void OSRExit::executeOSRExit(Context& context)
         adjustedThreshold = BaselineExecutionCounter::clippedThreshold(codeBlock->globalObject(), adjustedThreshold);
 
         CodeBlock* codeBlockForExit = baselineCodeBlockForOriginAndBaselineCodeBlock(exit.m_codeOrigin, baselineCodeBlock);
+
+#if CPU(MIPS)
+        bool exitToLLInt = false;
+#else
         bool exitToLLInt = Options::forceOSRExitToLLInt() || codeBlockForExit->jitType() == JITType::InterpreterThunk;
+#endif
         void* jumpTarget;
         if (exitToLLInt) {
             unsigned bytecodeOffset = exit.m_codeOrigin.bytecodeIndex();

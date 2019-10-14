@@ -140,8 +140,11 @@ void handleExitCounts(CCallHelpers& jit, const OSRExitBase& exit)
 
 void* callerReturnPC(CodeBlock* baselineCodeBlockForCaller, unsigned callBytecodeIndex, InlineCallFrame::Kind trueCallerCallKind, bool& callerIsLLInt)
 {
+#if CPU(MIPS)
+    callerIsLLInt = baselineCodeBlockForCaller->jitType() == JITType::InterpreterThunk;
+#else
     callerIsLLInt = Options::forceOSRExitToLLInt() || baselineCodeBlockForCaller->jitType() == JITType::InterpreterThunk;
-
+#endif
     void* jumpTarget;
 
     if (callerIsLLInt) {
@@ -380,7 +383,11 @@ void adjustAndJumpToTarget(VM& vm, CCallHelpers& jit, const OSRExitBase& exit)
     ASSERT(JITCode::isBaselineCode(codeBlockForExit->jitType()));
 
     void* jumpTarget;
+#if CPU(MIPS)
+    bool exitToLLInt = false;
+#else
     bool exitToLLInt = Options::forceOSRExitToLLInt() || codeBlockForExit->jitType() == JITType::InterpreterThunk;
+#endif
     if (exitToLLInt) {
         unsigned bytecodeOffset = exit.m_codeOrigin.bytecodeIndex();
         const Instruction& currentInstruction = *codeBlockForExit->instructions().at(bytecodeOffset).ptr();
